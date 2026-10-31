@@ -1,0 +1,65 @@
+# SPDX-License-Identifier: MIT
+
+rsource "drivers/input/Kconfig"
+
+DT_CHOSEN_LAYER_INDICATOR := zitaotech,layer-indicator
+DT_CHOSEN_CAPSLOCK_INDICATOR := zitaotech,capslock-indicator
+
+menuconfig ZMK_BB9900_LAYER_INDICATOR
+    bool "Layer indicator LED (big button backlight)"
+    default $(dt_chosen_enabled,$(DT_CHOSEN_LAYER_INDICATOR))
+    select LED
+
+if ZMK_BB9900_LAYER_INDICATOR
+
+config ZMK_BB9900_LAYER_INDICATOR_BRT
+    int "Brightness on layer 1 (SYM), in percent"
+    range 1 100
+    default 100
+
+config ZMK_BB9900_LAYER_INDICATOR_CYCLE_MAX_BRT
+    int "Maximum brightness of the breathing (layer 2) and blinking (layer 3) effects, in percent"
+    range 1 100
+    default 100
+
+config ZMK_BB9900_LAYER_INDICATOR_CYCLE_MIN_BRT
+    int "Minimum brightness of the breathing (layer 2) and blinking (layer 3) effects, in percent"
+    range 0 100
+    default 20
+
+config ZMK_BB9900_LAYER_INDICATOR_CYCLE_STEP
+    int "Brightness change per breathing step, in percent"
+    range 1 100
+    default 5
+
+config ZMK_BB9900_LAYER_INDICATOR_CYCLE_INTERVAL
+    int "Milliseconds between breathing steps"
+    default 20
+
+config ZMK_BB9900_LAYER_INDICATOR_BLINK_INTERVAL
+    int "Milliseconds between blink toggles"
+    default 300
+
+endif # ZMK_BB9900_LAYER_INDICATOR
+
+menuconfig ZMK_BB9900_CAPSLOCK_INDICATOR
+    bool "Caps lock indicator LED (trackpad backlight)"
+    default $(dt_chosen_enabled,$(DT_CHOSEN_CAPSLOCK_INDICATOR))
+    depends on ZMK_HID_INDICATORS
+    select LED
+
+if ZMK_BB9900_CAPSLOCK_INDICATOR
+
+config ZMK_BB9900_CAPSLOCK_INDICATOR_BRT
+    int "Brightness when caps lock is on, in percent"
+    range 1 100
+    default 100
+
+endif # ZMK_BB9900_CAPSLOCK_INDICATOR
+
+config ZMK_BB9900_INDICATOR_SCROLL
+    bool "Input processor that turns trackpad motion into scrolling while a HID indicator is on"
+    default y
+    depends on DT_HAS_ZITAOTECH_INPUT_PROCESSOR_INDICATOR_SCROLL_ENABLED
+    depends on ZMK_POINTING
+    depends on ZMK_HID_INDICATORS

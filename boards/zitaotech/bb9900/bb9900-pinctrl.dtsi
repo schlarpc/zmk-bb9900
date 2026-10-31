@@ -1,0 +1,62 @@
+/*
+ * Copyright (c) 2023 ZitaoTech
+ * SPDX-License-Identifier: MIT
+ */
+
+&pinctrl {
+    i2c0_default: i2c0_default {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 22)>,
+                <NRF_PSEL(TWIM_SCL, 1, 0)>;
+            bias-pull-up;
+        };
+    };
+
+    i2c0_sleep: i2c0_sleep {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 22)>,
+                <NRF_PSEL(TWIM_SCL, 1, 0)>;
+            low-power-enable;
+            bias-pull-up;
+        };
+    };
+
+    pwm0_default: pwm0_default {
+        group1 {
+            psels = <NRF_PSEL(PWM_OUT0, 0, 3)>; // Big button backlight (layer indicator)
+        };
+    };
+
+    pwm0_sleep: pwm0_sleep {
+        group1 {
+            psels = <NRF_PSEL(PWM_OUT0, 0, 3)>;
+            bias-pull-down;
+        };
+    };
+
+    pwm1_default: pwm1_default {
+        group1 {
+            psels = <NRF_PSEL(PWM_OUT0, 0, 9)>; // Keyboard backlight
+        };
+    };
+
+    pwm1_sleep: pwm1_sleep {
+        group1 {
+            psels = <NRF_PSEL(PWM_OUT0, 0, 9)>;
+            bias-pull-down;
+        };
+    };
+
+    pwm2_default: pwm2_default {
+        group1 {
+            psels = <NRF_PSEL(PWM_OUT0, 0, 10)>; // Trackpad backlight (caps lock indicator)
+        };
+    };
+
+    pwm2_sleep: pwm2_sleep {
+        group1 {
+            psels = <NRF_PSEL(PWM_OUT0, 0, 10)>;
+            bias-pull-down;
+        };
+    };
+};

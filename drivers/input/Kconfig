@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: MIT
+
+config INPUT_A320
+    bool "Avago ADBS-A320 optical finger navigation sensor"
+    default y
+    depends on DT_HAS_AVAGO_A320_ENABLED
+    depends on INPUT
+    select I2C
+    help
+      Polling input driver for the ADBS-A320 optical trackpad used in the
+      BlackBerry 9900 and similar devices.

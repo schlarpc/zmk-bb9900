@@ -1,0 +1,39 @@
+# Copyright (c) 2023 ZitaoTech
+# SPDX-License-Identifier: MIT
+
+if BOARD_BB9900
+
+config ZMK_KEYBOARD_NAME
+    default "bb9900"
+
+if USB_DEVICE_STACK
+
+config USB_NRFX
+    default y
+
+endif # USB_DEVICE_STACK
+
+config BT_CTLR
+    default BT
+
+# The A320 trackpad sits on i2c0.
+config I2C
+    default y
+
+config INPUT
+    default y
+
+config ZMK_POINTING
+    default y
+
+# Keyboard backlight and both indicator LEDs are PWM driven.
+config PWM
+    default y
+
+config LED
+    default y
+
+config LED_PWM
+    default y
+
+endif # BOARD_BB9900

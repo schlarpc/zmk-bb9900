@@ -1,0 +1,8 @@
+board:
+  name: bb9900
+  full_name: BB9900 USB/BLE Keyboard
+  vendor: zitaotech
+  socs:
+    - name: nrf52840
+      variants:
+        - name: zmk

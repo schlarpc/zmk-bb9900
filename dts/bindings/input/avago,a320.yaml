@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: MIT
+
+description: |
+  Avago ADBS-A320 optical finger navigation sensor, as used for the BlackBerry 9900 trackpad.
+  Reports relative X/Y motion through the Zephyr input subsystem.
+
+compatible: "avago,a320"
+
+include: i2c-device.yaml
+
+properties:
+  polling-interval-ms:
+    type: int
+    default: 10
+    description: How often to poll the motion register.
