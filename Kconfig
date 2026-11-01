@@ -65,3 +65,9 @@ config ZMK_BB9900_SCROLL_CURVE
     default y
     depends on DT_HAS_ZITAOTECH_INPUT_PROCESSOR_SCROLL_CURVE_ENABLED
     depends on ZMK_POINTING
+
+config ZMK_BB9900_SLEEP_DIAG
+    bool "Log deep sleep diagnostics (debug builds)"
+    depends on ZMK_SLEEP
+    depends on PM_DEVICE
+    depends on LOG

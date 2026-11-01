@@ -58,7 +58,11 @@
         name = "bb9900-firmware-debug";
         inherit (firmware) westDeps;
         snippets = [ "zmk-usb-logging" ];
-        extraCmakeFlags = [ "-DCONFIG_INPUT_LOG_LEVEL_DBG=y" "-DCONFIG_LOG_BUFFER_SIZE=8192" ];
+        extraCmakeFlags = [
+          "-DCONFIG_INPUT_LOG_LEVEL_DBG=y"
+          "-DCONFIG_LOG_BUFFER_SIZE=8192"
+          "-DCONFIG_ZMK_BB9900_SLEEP_DIAG=y"
+        ];
       };
 
       flash = zmk-nix.packages.${system}.flash.override { inherit firmware; };
