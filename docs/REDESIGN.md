@@ -165,9 +165,10 @@ Where the current goes:
     repeatedly: cycles windows.
   - [ ] Tap SYM, then W: `1`, then back to BASE. Hold SYM and type `123`. Double-tap SYM: locked
     (big buttons steady). SYM again: BASE.
-  - [ ] Press `alt` + `aA` together: one key from UPPER (try an arrow). Hold the combo: UPPER while
-    held. Double-tap the combo: locked (big buttons breathing). Combo again: BASE.
-  - [ ] Locked UPPER, press SYM: switches to SYM. Locked SYM, press `alt` + `aA`: switches to UPPER.
+  - [ ] Press `alt` + `aA` together: UPPER toggles on (big buttons breathing). Combo again: BASE.
+    Hold the combo: UPPER while held. (The first build double-tapped to lock, which could not
+    work reliably through a combo: UPPER fell back to one-shot and timed out after 2 s.)
+  - [ ] UPPER on, press SYM: switches to SYM. Locked SYM, press `alt` + `aA`: UPPER on top.
   - [ ] Alt+Shift (for example the Android language switch): tap `alt`, then tap `aA`, without the
     combo firing.
   - [ ] `$` types `$`. On UPPER, T/Y = `< >`, U = trackpad power, P = `=`.
