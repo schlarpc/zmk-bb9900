@@ -29,6 +29,7 @@ LOG_MODULE_REGISTER(input_a320, CONFIG_INPUT_LOG_LEVEL);
 #define A320_REG_OFN_ENGINE 0x60
 #define A320_REG_OFN_RESOLUTION 0x62
 #define A320_REG_OFN_SPEED_CONTROL 0x63
+#define A320_REG_OFN_SPEED_ST12 0x64
 
 #define A320_PRODUCT_ID 0x83
 #define A320_INVERSE_PRODUCT_ID 0x7c
@@ -42,9 +43,14 @@ LOG_MODULE_REGISTER(input_a320, CONFIG_INPUT_LOG_LEVEL);
 #define A320_OFN_ENGINE_ASSERT_DEASSERT BIT(5)
 #define A320_OFN_ENGINE_FINGER BIT(2)
 
-// Datasheet power-up values: wake and run at 500 CPI, check speed every 16 ms, allow 250 CPI.
+// Datasheet power-up value: wake and run at 500 CPI.
 #define A320_OFN_RESOLUTION_DEFAULT 0x12
-#define A320_OFN_SPEED_CONTROL_DEFAULT 0x0e
+
+#define A320_OFN_SPEED_CONTROL_LOW_CPI BIT(1)
+#define A320_OFN_SPEED_CONTROL_HIGH_CPI BIT(0)
+#define A320_OFN_SPEED_CONTROL_INTERVAL(ms) ((((ms) / 4) - 1) << 2)
+
+#define A320_SPEED_THRESHOLD_COUNT 8
 
 // Datasheet timings: tVRT-NRST after power is stable, tMOT-RST after a reset.
 #define A320_POWER_UP_DELAY_MS 100
@@ -66,7 +72,13 @@ struct a320_config {
     struct i2c_dt_spec bus;
     const struct device *ext_power;
     uint32_t polling_interval_ms;
+    uint32_t motion_polling_interval_ms;
+    uint32_t motion_timeout_ms;
+    uint16_t liftoff_shutter_threshold;
     uint8_t ofn_engine;
+    uint8_t ofn_speed_control;
+    bool has_speed_thresholds;
+    uint8_t speed_thresholds[A320_SPEED_THRESHOLD_COUNT];
 };
 
 struct a320_data {
@@ -75,6 +87,7 @@ struct a320_data {
     enum a320_state state;
     uint8_t failures;
     int64_t next_health_check;
+    int64_t last_motion;
     bool tracing_motion;
 };
 
@@ -143,9 +156,17 @@ static int a320_configure(const struct device *dev) {
         }
 
         ret = i2c_reg_write_byte_dt(&cfg->bus, A320_REG_OFN_SPEED_CONTROL,
-                                    A320_OFN_SPEED_CONTROL_DEFAULT);
+                                    cfg->ofn_speed_control);
         if (ret < 0) {
             return ret;
+        }
+
+        for (int i = 0; cfg->has_speed_thresholds && i < A320_SPEED_THRESHOLD_COUNT; i++) {
+            ret = i2c_reg_write_byte_dt(&cfg->bus, A320_REG_OFN_SPEED_ST12 + i,
+                                        cfg->speed_thresholds[i]);
+            if (ret < 0) {
+                return ret;
+            }
         }
     }
 
@@ -198,13 +219,34 @@ static int a320_read_motion(const struct device *dev, int8_t *dx, int8_t *dy) {
         return ret;
     }
 
+    // On overflow the deltas hold the saturated values, which is still the right direction.
     if (motion & A320_MOTION_OVF) {
-        LOG_DBG("motion overflow, dropping sample");
-        return -EOVERFLOW;
+        LOG_DBG("motion overflow");
     }
 
     *dx = (int8_t)x;
     *dy = (int8_t)y;
+
+    if (cfg->liftoff_shutter_threshold > 0) {
+        uint8_t sh_hi, sh_lo;
+
+        ret = i2c_reg_read_byte_dt(&cfg->bus, A320_REG_SHUTTER_UPPER, &sh_hi);
+        if (ret < 0) {
+            return ret;
+        }
+
+        ret = i2c_reg_read_byte_dt(&cfg->bus, A320_REG_SHUTTER_LOWER, &sh_lo);
+        if (ret < 0) {
+            return ret;
+        }
+
+        uint16_t shutter = (sh_hi << 8) | sh_lo;
+        if (shutter > cfg->liftoff_shutter_threshold) {
+            LOG_DBG("dropping liftoff sample dx=%d dy=%d shutter=%u", *dx, *dy, shutter);
+            return -EAGAIN;
+        }
+    }
+
     return 0;
 }
 
@@ -236,20 +278,24 @@ static uint32_t a320_step_running(const struct device *dev) {
     int8_t dx, dy;
     int ret;
 
+    int64_t now = k_uptime_get();
+
     ret = a320_read_motion(dev, &dx, &dy);
     if (IS_ENABLED(CONFIG_INPUT_LOG_LEVEL_DBG) && (ret == 0 || ret == -ENODATA)) {
         a320_trace(dev, ret == 0, dx, dy);
+    }
+    if (ret == 0 || ret == -EAGAIN) {
+        data->last_motion = now;
     }
     if (ret == 0 && (dx != 0 || dy != 0)) {
         // Always report both axes, X first, so input processors can rely on the ordering.
         input_report_rel(dev, INPUT_REL_X, dx, false, K_FOREVER);
         input_report_rel(dev, INPUT_REL_Y, dy, true, K_FOREVER);
-    } else if (ret < 0 && ret != -ENODATA && ret != -EOVERFLOW) {
+    } else if (ret < 0 && ret != -ENODATA && ret != -EAGAIN) {
         // Also expected while ext power is toggled off with the T key.
         return a320_fail(dev, "motion read", ret);
     }
 
-    int64_t now = k_uptime_get();
     if (now >= data->next_health_check) {
         data->next_health_check = now + A320_HEALTH_CHECK_INTERVAL_MS;
 
@@ -267,6 +313,9 @@ static uint32_t a320_step_running(const struct device *dev) {
         }
     }
 
+    if (now - data->last_motion < cfg->motion_timeout_ms) {
+        return cfg->motion_polling_interval_ms;
+    }
     return cfg->polling_interval_ms;
 }
 
@@ -343,13 +392,25 @@ static int a320_init(const struct device *dev) {
     (A320_OFN_ENGINE_FEATURES(n) ? (A320_OFN_ENGINE_ENABLE | A320_OFN_ENGINE_FEATURES(n)) : 0)
 
 #define A320_DEFINE(n)                                                                             \
+    BUILD_ASSERT(DT_INST_PROP_LEN_OR(n, speed_thresholds, A320_SPEED_THRESHOLD_COUNT) ==           \
+                     A320_SPEED_THRESHOLD_COUNT,                                                   \
+                 "speed-thresholds needs exactly 8 values");                                       \
     static struct a320_data a320_data_##n;                                                         \
     static const struct a320_config a320_config_##n = {                                            \
         .bus = I2C_DT_SPEC_INST_GET(n),                                                            \
         .ext_power = COND_CODE_1(DT_INST_NODE_HAS_PROP(n, ext_power),                              \
                                  (DEVICE_DT_GET(DT_INST_PHANDLE(n, ext_power))), (NULL)),          \
         .polling_interval_ms = DT_INST_PROP(n, polling_interval_ms),                               \
+        .motion_polling_interval_ms = DT_INST_PROP(n, motion_polling_interval_ms),                 \
+        .motion_timeout_ms = DT_INST_PROP(n, motion_timeout_ms),                                   \
+        .liftoff_shutter_threshold = DT_INST_PROP(n, liftoff_shutter_threshold),                   \
         .ofn_engine = A320_OFN_ENGINE_BITS(n),                                                     \
+        .ofn_speed_control =                                                                       \
+            A320_OFN_SPEED_CONTROL_INTERVAL(DT_INST_PROP(n, speed_check_interval_ms)) |            \
+            A320_OFN_SPEED_CONTROL_LOW_CPI |                                                       \
+            (DT_INST_PROP(n, high_cpi) ? A320_OFN_SPEED_CONTROL_HIGH_CPI : 0),                     \
+        .has_speed_thresholds = DT_INST_NODE_HAS_PROP(n, speed_thresholds),                        \
+        .speed_thresholds = DT_INST_PROP_OR(n, speed_thresholds, {0}),                             \
     };                                                                                             \
     DEVICE_DT_INST_DEFINE(n, a320_init, NULL, &a320_data_##n, &a320_config_##n, POST_KERNEL,       \
                           CONFIG_INPUT_INIT_PRIORITY, NULL);

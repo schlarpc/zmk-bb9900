@@ -163,10 +163,18 @@ RC(2,3)          RC(2,1)             RC(3,1)             RC(4,1)          RC(6,2
         compatible = "avago,a320";
         reg = <0x3b>;
         polling-interval-ms = <10>;
+        motion-polling-interval-ms = <4>;
         ext-power = <&ext_power_supply>;
         speed-switching;
         assert-deassert;
         finger-detect;
+        // Tuned from traces: thumb swipes peak at 4-8 inches per second, well under the sensor
+        // defaults, so step up through 750/1000/1250 CPI at 2, 3 and 4 ips.
+        //                   ST12 ST21 ST23 ST32 ST34 ST43 ST45 ST54
+        speed-thresholds = [  08   06   10   0c   18   14   20   1c ];
+        high-cpi;
+        // Tracking shutter values sit around 140-230 and jump well above that as the finger lifts.
+        liftoff-shutter-threshold = <240>;
     };
 };
 
