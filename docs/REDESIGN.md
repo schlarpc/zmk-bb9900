@@ -34,6 +34,18 @@ cycle.
    - Scroll mode may now scroll faster. Its curve was tuned for 500 CPI.
    - If the trackpad is still dead on some boots, flash `nix run .#flash-debug`. Then read the log
      with `tio /dev/ttyACM0` and look for `input_a320` lines.
+   **Follow-up, tuned from serial traces (`b32ee0d`, `959f1b3`, `2c29cd1`):**
+   - Thumb swipes peak at 4–8 ips. That is below the sensor's default speed-switching
+     thresholds (8–10 ips), so the sensor rarely left 500 CPI. The thresholds are now 2/3/4 ips
+     and the top step is 1250 CPI.
+   - Polling runs every 4 ms while the finger is moving. The sensor makes a new sample about
+     every 6 ms, so polling faster gains nothing.
+   - Saturated samples are kept instead of dropped.
+   - Small samples with a high shutter value are dropped as liftoff twitches, unless they continue
+     a fast stroke.
+   - The fastest swipes still saturate at 127 counts per frame. That is about 17 ips, above the
+     sensor's rated 15 ips, so it is a hardware limit.
+   Result reported on hardware: 2–3 swipes to cross the screen, fewer twitches.
 2. **Pointer acceleration in firmware, if still needed after item 1.** Upstream ZMK has no
    acceleration processor. Community modules exist (forks of `zmk-pointing-acceleration`), but they
    need vetting. The OS adds its own acceleration on top: libinput uses its "adaptive" profile for
@@ -80,8 +92,9 @@ Where the current goes:
    unless we find the motion pin (trackpad item 6).
 3. **Trackpad polling at 100 Hz (inherited).** Each poll wakes the CPU for several I²C transfers,
    which I estimate at 50–150 µA on average. The A320 drops into its own rest modes when idle (Rest1
-   0.4 mA, then Rest2 0.1 mA after 9.5 s, then Rest3 0.04 mA after about 10 min). I have not
-   checked whether constant polling keeps it in Run mode (3.1 mA), which would cost a lot more. To
+   0.4 mA, then Rest2 0.1 mA after 9.5 s, then Rest3 0.04 mA after about 10 min). Traces show
+   that it still reaches Rest1 and Rest2 while the firmware polls it every 10 ms (the Observation
+   register reads `0x5f` and then `0x9f`). So polling does not hold it in Run mode (3.1 mA). To
    do: adaptive polling, fast while moving and slow (or interrupt-driven) when idle.
 4. **Indicator LEDs ignore idle (inherited).** A layer left toggled on with `&tog` keeps the
    big-button LED lit or animating. Caps lock left on (scroll mode) keeps the trackpad LED at 100%.
@@ -136,5 +149,7 @@ Where the current goes:
 
 ## Done
 
-- Trackpad: datasheet bring-up, speed switching, ID check and auto-recovery (`761f85a`). Needs a
-  hardware test.
+- Trackpad: datasheet bring-up, speed switching, ID check and auto-recovery (`761f85a`). Tested
+  on hardware: comes up on every boot, fine movement much better.
+- Trackpad: speed thresholds, polling while moving, and liftoff filter tuned from traces
+  (`b32ee0d`..`2c29cd1`).
