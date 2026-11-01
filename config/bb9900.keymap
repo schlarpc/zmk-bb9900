@@ -63,6 +63,12 @@
             bindings = <&bt_select_clear>, <&bt_select>;
         };
 
+        // Toggle smooth or whole-notch scrolling for the current output (USB or BLE profile).
+        scroll_res: scroll_resolution {
+            compatible = "zitaotech,behavior-scroll-resolution";
+            #binding-cells = <0>;
+        };
+
         // Call: tap to toggle scroll mode, hold to scroll while held.
         scroll_mode: scroll_mode {
             compatible = "zmk,behavior-hold-tap";
@@ -150,7 +156,7 @@
                  &msc SCRL_UP                                                                                       &msc SCRL_DOWN
     &bt_profile 0 0         &bt_profile 1 1                          &mkp LCLK                      &bt_profile 2 2                  &bt_profile 3 3
     &kp CLCK     &kp UP     &studio_unlock &sys_reset &kp LT        &kp GT            &out OUT_TOG     &kp PSCRN          &kp PIPE         &kp EQUAL
-    &kp LEFT     &kp DOWN   &kp RIGHT   &none      &kp BSLH      &kp AMPS          &kp LBRC         &kp RBRC        &kp CARET        &kp BSPC
+    &kp LEFT     &kp DOWN   &kp RIGHT   &scroll_res &kp BSLH      &kp AMPS          &kp LBRC         &kp RBRC        &kp CARET        &kp BSPC
     &trans       &none      &none       &none      &bl BL_DEC    &bl BL_TOG        &bl BL_INC       &none           &bootloader      &kp ENTER
     &trans                  &trans                                   &kp SPACE                      &to SYM                          &trans
             >;

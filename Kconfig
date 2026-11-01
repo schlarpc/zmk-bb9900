@@ -66,6 +66,12 @@ config ZMK_BB9900_SCROLL_CURVE
     depends on DT_HAS_ZITAOTECH_INPUT_PROCESSOR_SCROLL_CURVE_ENABLED
     depends on ZMK_POINTING
 
+config ZMK_BB9900_SCROLL_RESOLUTION
+    bool "Per-output toggle between smooth and whole-notch scrolling"
+    default y
+    depends on DT_HAS_ZITAOTECH_BEHAVIOR_SCROLL_RESOLUTION_ENABLED
+    depends on ZMK_POINTING_SMOOTH_SCROLLING
+
 config ZMK_BB9900_USB_SUSPEND_IS_UNPLUGGED
     bool "Treat a suspended USB bus as unplugged"
     default y if BOARD_BB9900
@@ -74,6 +80,12 @@ config ZMK_BB9900_USB_SUSPEND_IS_UNPLUGGED
       The BB9900 charging circuit back-feeds the battery onto VBUS, so unplugging the cable
       never produces a USB disconnect, only a bus suspend. Without this, ZMK thinks USB power
       is present and never enters deep sleep.
+
+config ZMK_BB9900_SCROLL_RESOLUTION
+    bool "Per-output toggle between smooth and whole-notch scrolling"
+    default y
+    depends on DT_HAS_ZITAOTECH_BEHAVIOR_SCROLL_RESOLUTION_ENABLED
+    depends on ZMK_POINTING_SMOOTH_SCROLLING
 
 config ZMK_BB9900_USB_SUSPEND_IS_UNPLUGGED_DELAY_MS
     int "Milliseconds of USB suspend before treating it as unplugged"

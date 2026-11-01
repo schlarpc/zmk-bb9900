@@ -49,6 +49,8 @@ On UPPER:
   and pair a new device. Pairing asks for the 6-digit code shown on the host: type it with the
   SYM layer digits (double-tap SYM to lock) and press Enter;
 - U toggles USB/BLE output;
+- F toggles smooth or whole-notch scrolling for the current output (each Bluetooth profile and
+  USB remember their own setting). Use whole notches for iPhone, iPad and Mac;
 - `$` enters the bootloader.
 
 The big-button backlight shows the layer: off on BASE, steady on SYM, breathing on UPPER.
@@ -74,8 +76,8 @@ includes trackpad and deep-sleep diagnostics.
 - **Keymap:** `config/bb9900.keymap`. Run `nix run .#draw` afterwards to update the image above.
   CI checks that it matches.
 - **Settings** (sleep, backlight, indicator lights, smooth scrolling): `config/bb9900.conf`.
-  Turn off `CONFIG_ZMK_POINTING_SMOOTH_SCROLLING` if you use the keyboard with a Mac or an
-  iPhone/iPad, which would otherwise scroll about 16× too fast.
+  For a Mac, iPhone or iPad, press UPPER-F while connected to it: those hosts do not support
+  smooth scrolling and would otherwise scroll about 16× too fast.
 - **Trackpad speed and scroll speed:** see the comments at the bottom of the keymap.
 
 ## Updating ZMK

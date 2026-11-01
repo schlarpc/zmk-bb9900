@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: MIT
+
+description: |
+  Toggles between smooth (high-resolution) and whole-notch scrolling for the currently selected
+  output (USB or one BLE profile). The choice is saved per output. Use whole notches for hosts
+  that do not support high-resolution scrolling, such as iOS and macOS.
+
+compatible: "zitaotech,behavior-scroll-resolution"
+
+include: zero_param.yaml

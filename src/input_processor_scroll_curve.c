@@ -13,6 +13,10 @@
 #include <zephyr/logging/log.h>
 #include <drivers/input_processor.h>
 
+#if IS_ENABLED(CONFIG_ZMK_BB9900_SCROLL_RESOLUTION)
+#include "scroll_resolution.h"
+#endif
+
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 // Gains are in 1/16 of a high-resolution unit, and 16 high-resolution units make one notch.
@@ -69,8 +73,13 @@ static int scroll_curve_handle_event(const struct device *dev, struct input_even
         return ZMK_INPUT_PROC_CONTINUE;
     }
 
+    bool notched = !IS_ENABLED(CONFIG_ZMK_POINTING_SMOOTH_SCROLLING);
+#if IS_ENABLED(CONFIG_ZMK_BB9900_SCROLL_RESOLUTION)
+    notched = notched || bb9900_scroll_notched();
+#endif
+
     int32_t divisor = GAIN_SCALE;
-    if (!IS_ENABLED(CONFIG_ZMK_POINTING_SMOOTH_SCROLLING)) {
+    if (notched) {
         divisor *= HI_RES_PER_NOTCH;
     }
 

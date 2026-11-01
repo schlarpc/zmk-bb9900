@@ -30,6 +30,7 @@ parse_config:
     "&kp C_AC_SEARCH": Search
     "&kp PSCRN": PrtSc
     "&kp C_AC_HOME": Home
+    "&scroll_res": Smooth scroll
     "&kp C_MUTE": Mute
     "&kp C_VOL_UP": Vol+
     "&kp C_VOL_DN": Vol−
