@@ -31,8 +31,7 @@
 // generous: a single tap still resolves as soon as the next key is pressed.
 //
 // Layer keys: SYM taps for one key, holds for momentary and double-taps to lock; alt + aA
-// toggles UPPER on tap and holds for momentary. In a locked SYM, SYM returns to BASE; in UPPER,
-// SYM switches to SYM.
+// toggles UPPER. In a locked SYM, SYM returns to BASE; in UPPER, SYM switches to SYM.
 &sk {
     release-after-ms = <2000>;
     quick-release;
@@ -84,17 +83,6 @@
             tapping-term-ms = <300>;
             bindings = <&sl SYM>, <&to SYM>;
         };
-
-        // alt + aA: tap to toggle UPPER, hold for UPPER while held. A tap dance cannot be
-        // double-tapped reliably through a combo: the second combo's key presses settle the
-        // dance early as a single tap.
-        upper_mode: upper_mode {
-            compatible = "zmk,behavior-hold-tap";
-            #binding-cells = <2>;
-            flavor = "hold-preferred";
-            tapping-term-ms = <200>;
-            bindings = <&mo>, <&tog>;
-        };
     };
 
     combos {
@@ -103,13 +91,13 @@
         upper_left {
             timeout-ms = <50>;
             key-positions = <POS_ALT POS_LEFT_AA>;
-            bindings = <&upper_mode UPPER UPPER>;
+            bindings = <&tog UPPER>;
         };
 
         upper_right {
             timeout-ms = <50>;
             key-positions = <POS_ALT POS_RIGHT_AA>;
-            bindings = <&upper_mode UPPER UPPER>;
+            bindings = <&tog UPPER>;
         };
     };
 
