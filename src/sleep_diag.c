@@ -10,6 +10,8 @@
 // attempted, and which device, if any, refused to suspend. To find that device it dry-runs a
 // suspend and resume of every candidate just before ZMK's real attempt.
 
+#include <string.h>
+
 #include <zephyr/device.h>
 #include <zephyr/init.h>
 #include <zephyr/kernel.h>
@@ -22,6 +24,8 @@
 #include <zmk/events/activity_state_changed.h>
 #include <zmk/usb.h>
 
+#include <hal/nrf_power.h>
+
 LOG_MODULE_REGISTER(bb9900_sleep_diag, LOG_LEVEL_INF);
 
 static struct {
@@ -32,7 +36,18 @@ static struct {
     const char *failed_device;
     int failed_ret;
     uint32_t dry_runs;
+    // VBUS detect samples, once a second: how many saw VBUS present and absent.
+    uint32_t vbus_present;
+    uint32_t vbus_absent;
+    // USB status changes as seen by ZMK, oldest first: status and uptime in seconds.
+    struct {
+        int status;
+        uint32_t at;
+    } history[16];
+    size_t history_len;
+    int last_status;
 } diag = {
+    .last_status = -1,
     .usb_status_at_idle = -1,
     .usb_status_at_sleep = -1,
 };
@@ -89,6 +104,32 @@ static int sleep_diag_listener(const zmk_event_t *eh) {
 ZMK_LISTENER(bb9900_sleep_diag, sleep_diag_listener);
 ZMK_SUBSCRIPTION(bb9900_sleep_diag, zmk_activity_state_changed);
 
+static void sample_work_handler(struct k_work *work);
+static K_WORK_DELAYABLE_DEFINE(sample_work, sample_work_handler);
+
+static void sample_work_handler(struct k_work *work) {
+    if (nrf_power_usbregstatus_vbusdet_get(NRF_POWER)) {
+        diag.vbus_present++;
+    } else {
+        diag.vbus_absent++;
+    }
+
+    int status = zmk_usb_get_status();
+    if (status != diag.last_status) {
+        diag.last_status = status;
+        if (diag.history_len == ARRAY_SIZE(diag.history)) {
+            memmove(&diag.history[0], &diag.history[1],
+                    sizeof(diag.history) - sizeof(diag.history[0]));
+            diag.history_len--;
+        }
+        diag.history[diag.history_len].status = status;
+        diag.history[diag.history_len].at = k_uptime_get_32() / 1000;
+        diag.history_len++;
+    }
+
+    k_work_schedule(&sample_work, K_SECONDS(1));
+}
+
 static void report_work_handler(struct k_work *work);
 static K_WORK_DELAYABLE_DEFINE(report_work, report_work_handler);
 
@@ -99,11 +140,18 @@ static void report_work_handler(struct k_work *work) {
             diag.idle_events, diag.usb_status_at_idle, diag.sleep_events,
             diag.usb_status_at_sleep, diag.dry_runs,
             diag.failed_device ? diag.failed_device : "none", diag.failed_ret);
+    LOG_INF("vbus now=%d, samples present=%u absent=%u",
+            nrf_power_usbregstatus_vbusdet_get(NRF_POWER), diag.vbus_present, diag.vbus_absent);
+    for (size_t i = 0; i < diag.history_len; i++) {
+        LOG_INF("usb history %u: status=%d at=%us", (unsigned)i, diag.history[i].status,
+                diag.history[i].at);
+    }
     k_work_schedule(&report_work, K_SECONDS(5));
 }
 
 static int sleep_diag_init(void) {
     k_work_schedule(&report_work, K_SECONDS(5));
+    k_work_schedule(&sample_work, K_SECONDS(1));
     return 0;
 }
 
