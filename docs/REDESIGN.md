@@ -205,3 +205,10 @@ Where the current goes:
   - [ ] Lock UPPER or turn on scroll mode, wait 30 s: both lights go off. Press a key or touch the
     trackpad: they come back.
   - [ ] After a few seconds' pause, the first trackpad movement does not feel laggy.
+- Batch 4, tooling:
+  - A physical layout approximating the smile keyboard.
+  - ZMK Studio over USB and BLE (unlock: UPPER-E).
+  - `docs/keymap.svg` from keymap-drawer (`nix run .#draw`), checked by `nix flake check`.
+  - The repo is public at <https://github.com/schlarpc/zmk-bb9900>, with CI building every push
+    and PR and weekly ZMK and flake update PRs.
+  - [x] Studio connects, shows the BB9900 layout and edits work.
