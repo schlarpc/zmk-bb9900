@@ -190,16 +190,18 @@ Where the current goes:
   - [x] UPPER-Q toggles caps lock.
   Follow-ups: horizontal direction fixed (`676a08e`); scroll distance cut by about 30% (`aeb9879`).
 - Batch 3, power:
-  - Deep sleep after 30 min without use (`CONFIG_ZMK_SLEEP`). A key press wakes it. Ext power
+  - Deep sleep after 2 h without use (`CONFIG_ZMK_SLEEP`), changed from 30 min. A key press wakes it. Ext power
     and the trackpad are cut while asleep. ZMK never sleeps while USB power is present.
   - Big-button and trackpad lights turn off with the 30 s idle timeout.
   - The trackpad polls every 25 ms after 1 s without motion, 10 ms within 1 s, and 4 ms while
     moving.
   - TX power stays at +8 dBm, by choice.
   To test:
-  - [ ] On battery, leave it untouched past the sleep timeout: everything goes dark and BLE
+  - [x] On battery, leave it untouched past the sleep timeout: everything goes dark and BLE
     disconnects. A key press wakes it. It reconnects within a few seconds, and the trackpad works
-    after the wake.
+    after the wake. Tested with a 60 s timeout. The first try never slept: the charging circuit
+    back-feeds VBUS, so unplugging never produced a USB disconnect, and ZMK thought USB power
+    was present. Fixed by treating a suspended USB bus as unplugged (`ab9a87e`).
   - [ ] Lock UPPER or turn on scroll mode, wait 30 s: both lights go off. Press a key or touch the
     trackpad: they come back.
   - [ ] After a few seconds' pause, the first trackpad movement does not feel laggy.
