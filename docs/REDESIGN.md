@@ -181,9 +181,10 @@ Where the current goes:
   acceleration were skipped. To test:
   - [x] Tap Call: trackpad backlight on, trackpad scrolls. Tap Call again: back to the pointer.
   - [x] Hold Call and swipe: scrolls while held, pointer again on release.
-  - [ ] The big-button light does not change when scroll mode turns on.
+  - [x] The big-button light does not change when scroll mode turns on.
   - [x] Scroll mode works together with SYM and UPPER, and keys behave as normal in scroll mode.
-  - [ ] Scrolling is smooth (pixel steps) on this Linux machine. Slow swipes are controllable;
+  - [x] Scrolling is smooth (pixel steps) on this Linux machine. Slow swipes are controllable;
     fast swipes do not fling the page.
-  - [ ] Horizontal scroll goes the same way as vertical, like a wheel (first build had it reversed).
+  - [x] Horizontal scroll goes the same way as vertical, like a wheel (first build had it reversed).
   - [x] UPPER-Q toggles caps lock.
+  Follow-ups: horizontal direction fixed (`676a08e`); scroll distance cut by about 30% (`aeb9879`).
