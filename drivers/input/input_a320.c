@@ -54,8 +54,10 @@ LOG_MODULE_REGISTER(input_a320, CONFIG_INPUT_LOG_LEVEL);
 
 #define A320_SPEED_THRESHOLD_COUNT 8
 
-// A high-shutter sample is kept when it continues a fast stroke: at least this many counts in
-// the previous sample, in the same direction, no more than this long ago.
+// Liftoff twitches are small. A high-shutter sample with at least this many counts is real
+// motion, and so is one that continues a fast stroke: at least this many counts in the previous
+// sample, in the same direction, no more than this long ago.
+#define A320_LIFTOFF_TWITCH_MAX_COUNTS 12
 #define A320_LIFTOFF_STROKE_MIN_COUNTS 8
 #define A320_LIFTOFF_STROKE_WINDOW_MS 20
 
@@ -265,7 +267,8 @@ static bool a320_is_liftoff_twitch(const struct device *dev, int8_t dx, int8_t d
     const struct a320_config *cfg = dev->config;
     const struct a320_data *data = dev->data;
 
-    if (cfg->liftoff_shutter_threshold == 0 || shutter <= cfg->liftoff_shutter_threshold) {
+    if (cfg->liftoff_shutter_threshold == 0 || shutter <= cfg->liftoff_shutter_threshold ||
+        abs(dx) + abs(dy) >= A320_LIFTOFF_TWITCH_MAX_COUNTS) {
         return false;
     }
 

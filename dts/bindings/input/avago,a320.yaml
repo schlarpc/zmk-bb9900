@@ -15,10 +15,10 @@ properties:
     description: How often to poll the motion register while the finger is not moving.
   motion-polling-interval-ms:
     type: int
-    default: 2
+    default: 4
     description: |
-      How often to poll while the finger is moving. The delta registers are 8 bits, so polling
-      too slowly clips fast swipes.
+      How often to poll while the finger is moving. The sensor produces a new sample about
+      every 6 ms, so polling much faster than this gains nothing.
   motion-timeout-ms:
     type: int
     default: 100
@@ -51,8 +51,8 @@ properties:
     type: int
     default: 0
     description: |
-      Drop motion samples whose shutter value is above this, unless they continue a fast stroke
-      in the same direction. The shutter time rises as the finger lifts off, and those last
+      Drop small motion samples whose shutter value is above this, unless they continue a fast
+      stroke in the same direction. The shutter time rises as the finger lifts off, and those last
       samples cause the cursor to twitch. 0 disables the filter.
   assert-deassert:
     type: boolean

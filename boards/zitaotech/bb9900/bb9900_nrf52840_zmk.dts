@@ -163,7 +163,7 @@ RC(2,3)          RC(2,1)             RC(3,1)             RC(4,1)          RC(6,2
         compatible = "avago,a320";
         reg = <0x3b>;
         polling-interval-ms = <10>;
-        motion-polling-interval-ms = <2>;
+        motion-polling-interval-ms = <4>;
         ext-power = <&ext_power_supply>;
         speed-switching;
         assert-deassert;
