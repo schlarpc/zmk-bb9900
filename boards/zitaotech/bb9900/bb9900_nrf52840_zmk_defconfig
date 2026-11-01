@@ -28,6 +28,10 @@ CONFIG_BT_CTLR_TX_PWR_PLUS_8=y
 CONFIG_ZMK_USB=y
 CONFIG_ZMK_BLE=y
 
+# Pairing needs the 6-digit code shown on the host typed on the keyboard, then Enter, so a
+# nearby device cannot claim an empty profile.
+CONFIG_ZMK_BLE_PASSKEY_ENTRY=y
+
 CONFIG_ZMK_EXT_POWER=y
 
 # Deep sleep after 2 hours without use; a key press wakes the keyboard.

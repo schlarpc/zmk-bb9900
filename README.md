@@ -46,7 +46,8 @@ also fixes several problems with the stock firmware.
 
 On UPPER:
 - the four big buttons select Bluetooth profiles 0–3; hold one for 2 s to clear that profile
-  and pair a new device;
+  and pair a new device. Pairing asks for the 6-digit code shown on the host: type it with the
+  SYM layer digits (double-tap SYM to lock) and press Enter;
 - U toggles USB/BLE output;
 - `$` enters the bootloader.
 
