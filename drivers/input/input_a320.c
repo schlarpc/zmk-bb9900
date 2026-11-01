@@ -20,6 +20,9 @@ LOG_MODULE_REGISTER(input_a320, CONFIG_INPUT_LOG_LEVEL);
 #define A320_REG_MOTION 0x02
 #define A320_REG_DELTA_X 0x03
 #define A320_REG_DELTA_Y 0x04
+#define A320_REG_SQUAL 0x05
+#define A320_REG_SHUTTER_UPPER 0x06
+#define A320_REG_SHUTTER_LOWER 0x07
 #define A320_REG_OBSERVATION 0x2e
 #define A320_REG_SOFT_RESET 0x3a
 #define A320_REG_INVERSE_PRODUCT_ID 0x3f
@@ -72,7 +75,32 @@ struct a320_data {
     enum a320_state state;
     uint8_t failures;
     int64_t next_health_check;
+    bool tracing_motion;
 };
+
+// Debug builds log every sample with image quality, shutter time and the current resolution
+// step, to tune speed switching and liftoff filtering against real swipes.
+static void a320_trace(const struct device *dev, bool motion, int8_t dx, int8_t dy) {
+    const struct a320_config *cfg = dev->config;
+    struct a320_data *data = dev->data;
+    uint8_t squal = 0, sh_hi = 0, sh_lo = 0, res = 0;
+
+    if (!motion) {
+        if (data->tracing_motion) {
+            LOG_DBG("trace lift");
+            data->tracing_motion = false;
+        }
+        return;
+    }
+
+    data->tracing_motion = true;
+    i2c_reg_read_byte_dt(&cfg->bus, A320_REG_SQUAL, &squal);
+    i2c_reg_read_byte_dt(&cfg->bus, A320_REG_SHUTTER_UPPER, &sh_hi);
+    i2c_reg_read_byte_dt(&cfg->bus, A320_REG_SHUTTER_LOWER, &sh_lo);
+    i2c_reg_read_byte_dt(&cfg->bus, A320_REG_OFN_RESOLUTION, &res);
+    LOG_DBG("trace t=%u dx=%d dy=%d squal=%u shutter=%u res=%u", k_uptime_get_32(), dx, dy,
+            squal, (sh_hi << 8) | sh_lo, res & 0x07);
+}
 
 static int a320_check_id(const struct device *dev) {
     const struct a320_config *cfg = dev->config;
@@ -209,6 +237,9 @@ static uint32_t a320_step_running(const struct device *dev) {
     int ret;
 
     ret = a320_read_motion(dev, &dx, &dy);
+    if (IS_ENABLED(CONFIG_INPUT_LOG_LEVEL_DBG) && (ret == 0 || ret == -ENODATA)) {
+        a320_trace(dev, ret == 0, dx, dy);
+    }
     if (ret == 0 && (dx != 0 || dy != 0)) {
         // Always report both axes, X first, so input processors can rely on the ordering.
         input_report_rel(dev, INPUT_REL_X, dx, false, K_FOREVER);
