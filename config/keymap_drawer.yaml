@@ -1,0 +1,53 @@
+# keymap-drawer settings for docs/keymap.svg. Regenerate with `nix run .#draw`.
+parse_config:
+  sticky_label: sticky
+  toggle_label: toggle
+  trans_legend: {t: ▽, type: trans}
+  raw_binding_map:
+    "&mkp LCLK": Click
+    "&mkp RCLK": R-Click
+    "&td0": {t: Click, h: "2×: BT clear"}
+    "&td_shift": {t: Shift, h: "2× caps word"}
+    "&td_sym": {t: SYM, h: "2×: lock"}
+    "&sk LALT": {t: Alt, h: sticky}
+    "&sk LCTRL": {t: Ctrl, h: sticky}
+    "&scroll_mode SCROLL SCROLL": {t: Scroll, h: hold}
+    "&mt ESC K_BACK": {t: Back, h: Esc}
+    "&hm OUT_TOG SPACE": {t: Space, h: USB/BLE}
+    "&to BASE": BASE
+    "&to SYM": SYM
+    "&msc SCRL_UP": Scroll↑
+    "&msc SCRL_DOWN": Scroll↓
+    "&bl BL_DEC": Dim
+    "&bl BL_TOG": Light
+    "&bl BL_INC": Bright
+    "&ext_power EP_TOG": Pad power
+    "&sys_reset": Reset
+    "&bootloader": Boot loader
+    "&studio_unlock": Studio unlock
+    "&kp C_AC_SEARCH": Search
+    "&kp PSCRN": PrtSc
+    "&kp C_MUTE": Mute
+    "&kp C_VOL_UP": Vol+
+    "&kp C_VOL_DN": Vol−
+    "&kp CLCK": Caps lock
+    "&kp LGUI": GUI
+    "&kp BSPC": ⌫
+    "&kp DEL": Del
+    "&kp ENTER": ⏎
+    "&tog UPPER": UPPER
+    "&kp UP": ↑
+    "&kp DOWN": ↓
+    "&kp LEFT": ←
+    "&kp RIGHT": →
+    "&kp SPACE": Space
+    "&kp TAB": Tab
+  zmk_combos:
+    upper_left: {key: "alt+aA: UPPER", l: [BASE], align: bottom, w: 110}
+    upper_right: {hidden: true}
+draw_config:
+  shrink_wide_legends: 14
+  key_w: 60
+  key_h: 56
+  combo_w: 40
+  combo_h: 26
