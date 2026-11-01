@@ -24,9 +24,9 @@ properties:
     description: Counts per sample scrolled at low-gain before switching to high-gain.
   low-gain:
     type: int
-    default: 48
+    default: 34
     description: Gain below the knee, in 1/16 high-resolution units per count.
   high-gain:
     type: int
-    default: 5
+    default: 3
     description: Gain above the knee, in 1/16 high-resolution units per count.

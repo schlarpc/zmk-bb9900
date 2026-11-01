@@ -212,6 +212,6 @@
 //
 // &scroll_curve {
 //     knee = <6>;
-//     low-gain = <48>;
-//     high-gain = <5>;
+//     low-gain = <34>;
+//     high-gain = <3>;
 // };
