@@ -153,3 +153,21 @@ Where the current goes:
   on hardware: comes up on every boot, fine movement much better.
 - Trackpad: speed thresholds, polling while moving, and liftoff filter tuned from traces
   (`b32ee0d`..`2c29cd1`).
+- Batch 1, typing and layers. Every key now does what its label says: `alt` = Alt, both `aA` =
+  Shift, `$` = `$`. `0` = Ctrl. `SYM` = the legends layer. `alt` + either `aA` = UPPER. Mods and
+  layers are sticky (tap = next key, hold = normal, 2 s timeout). Double-tap `aA` = caps word.
+  Double-tap SYM or the UPPER combo = lock. Inside a locked layer its own key returns to BASE.
+  `< >` moved to T/Y on UPPER, which pushed the ext power toggle from T to U. `KP_EQUAL` became
+  `EQUAL`. To test:
+  - [ ] Tap `aA`, then a letter: one capital. Hold `aA`: normal Shift.
+  - [ ] Double-tap `aA`: caps word, which ends at a space.
+  - [ ] Tap `0`, then C: Ctrl+C. Tap `alt`, then Tab: Alt+Tab. Hold `alt` and press Tab
+    repeatedly: cycles windows.
+  - [ ] Tap SYM, then W: `1`, then back to BASE. Hold SYM and type `123`. Double-tap SYM: locked
+    (big buttons steady). SYM again: BASE.
+  - [ ] Press `alt` + `aA` together: one key from UPPER (try an arrow). Hold the combo: UPPER while
+    held. Double-tap the combo: locked (big buttons breathing). Combo again: BASE.
+  - [ ] Locked UPPER, press SYM: switches to SYM. Locked SYM, press `alt` + `aA`: switches to UPPER.
+  - [ ] Alt+Shift (for example the Android language switch): tap `alt`, then tap `aA`, without the
+    combo firing.
+  - [ ] `$` types `$`. On UPPER, T/Y = `< >`, U = trackpad power, P = `=`.
