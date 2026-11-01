@@ -11,10 +11,12 @@
 #include <dt-bindings/zmk/pointing.h>
 #include <dt-bindings/zmk/backlight.h>
 #include <dt-bindings/zmk/ext_power.h>
+#include <dt-bindings/zmk/input_transform.h>
 
 #define BASE 0
 #define SYM 1
 #define UPPER 2
+#define SCROLL 3  // Keep in sync with CONFIG_ZMK_BB9900_TRACKPAD_INDICATOR_LAYER.
 
 // Key positions used by combos.
 #define POS_ALT 27
@@ -52,6 +54,15 @@
             #binding-cells = <2>;
             tapping-term-ms = <500>;
             bindings = <&out &kp>;
+        };
+
+        // Call: tap to toggle scroll mode, hold to scroll while held.
+        scroll_mode: scroll_mode {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "hold-preferred";
+            tapping-term-ms = <150>;
+            bindings = <&mo>, <&tog>;
         };
 
         // aA: tap for one capital, hold for Shift, double-tap for caps word.
@@ -129,7 +140,7 @@
 // alt + aA (either) = UPPER
 
                  &mkp LCLK                                                                                          &mkp RCLK
-    &kp CLCK                &kp LGUI                            &mkp LCLK                          &mt ESC K_BACK                    &kp TAB
+    &scroll_mode SCROLL SCROLL &kp LGUI                         &mkp LCLK                          &mt ESC K_BACK                    &kp TAB
     &kp Q        &kp W      &kp E       &kp R     &kp T         &kp Y             &kp U            &kp I            &kp O            &kp P
     &kp A        &kp S      &kp D       &kp F     &kp G         &kp H             &kp J            &kp K            &kp L            &kp BSPC
     &sk LALT     &kp Z      &kp X       &kp C     &kp V         &kp B             &kp N            &kp M            &kp DLLR         &kp ENTER
@@ -156,28 +167,51 @@
             bindings = <
                  &msc SCRL_UP                                                                                       &msc SCRL_DOWN
     &bt BT_SEL 0            &bt BT_SEL 1                             &td0                           &bt BT_SEL 2                     &bt BT_SEL 3
-    &none        &kp UP     &none       &sys_reset &kp LT        &kp GT            &ext_power EP_TOG &none          &kp PIPE         &kp EQUAL
+    &kp CLCK     &kp UP     &none       &sys_reset &kp LT        &kp GT            &ext_power EP_TOG &none          &kp PIPE         &kp EQUAL
     &kp LEFT     &kp DOWN   &kp RIGHT   &none      &kp BSLH      &kp AMPS          &kp LBRC         &kp RBRC        &kp CARET        &kp BSPC
     &trans       &none      &none       &none      &bl BL_DEC    &bl BL_TOG        &bl BL_INC       &none           &bootloader      &kp ENTER
     &trans                  &trans                                   &hm OUT_TOG SPACE              &to SYM                          &trans
             >;
         };
+
+        // Scroll mode: keys pass through, and the trackpad scrolls instead of moving the pointer.
+        scroll_layer {
+            display-name = "SCROLL";
+            bindings = <
+                 &trans                                                                                             &trans
+    &trans                  &trans                              &trans                             &trans                            &trans
+    &trans       &trans     &trans      &trans    &trans        &trans            &trans           &trans           &trans           &trans
+    &trans       &trans     &trans      &trans    &trans        &trans            &trans           &trans           &trans           &trans
+    &trans       &trans     &trans      &trans    &trans        &trans            &trans           &trans           &trans           &trans
+    &trans                  &trans                              &trans                             &trans                            &trans
+            >;
+        };
     };
 };
 
-// Trackpad tuning. Uncomment and edit to override the board default.
-// <&zip_xy_scaler 3 2> is pointer speed as a fraction (3/2 = 1.5x); use <&zip_x_scaler ...> and
-// <&zip_y_scaler ...> for separate horizontal and vertical speeds. interval-ms on &indicator_scroll
-// sets how often a scroll step can fire while caps lock is on (higher = slower).
-//
-// #include <dt-bindings/zmk/input_transform.h>
+// In scroll mode the trackpad goes through the scroll curve instead of the pointer scaler.
+// Tune the curve with knee, low-gain and high-gain on &scroll_curve (see its binding).
+&trackpad_listener {
+    scroll_mode {
+        layers = <SCROLL>;
+        input-processors = <&zip_xy_transform INPUT_TRANSFORM_XY_SWAP>,
+                           <&scroll_curve>;
+    };
+};
+
+// Pointer speed. Uncomment and edit to override the board default: <&zip_xy_scaler 3 2> is a
+// fraction (3/2 = 1.5x); use <&zip_x_scaler ...> and <&zip_y_scaler ...> for separate horizontal
+// and vertical speeds.
 //
 // &trackpad_listener {
 //     input-processors = <&zip_xy_transform INPUT_TRANSFORM_XY_SWAP>,
-//                        <&indicator_scroll>,
 //                        <&zip_xy_scaler 3 2>;
 // };
 //
-// &indicator_scroll {
-//     interval-ms = <30>;
+// Scroll speed:
+//
+// &scroll_curve {
+//     knee = <6>;
+//     low-gain = <48>;
+//     high-gain = <5>;
 // };

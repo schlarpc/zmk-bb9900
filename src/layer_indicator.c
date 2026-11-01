@@ -6,6 +6,7 @@
 
 // Big button backlight as a layer indicator:
 //   layer 0: off, layer 1: steady, layer 2: breathing, layer 3 and above: blinking.
+// The scroll mode layer has its own indicator on the trackpad, so it is skipped here.
 
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
@@ -96,8 +97,22 @@ static enum indicator_mode mode_for_layer(uint8_t layer) {
     }
 }
 
+static uint8_t indicated_layer(void) {
+    for (int layer = ZMK_KEYMAP_LAYERS_LEN - 1; layer > 0; layer--) {
+#if IS_ENABLED(CONFIG_ZMK_BB9900_TRACKPAD_INDICATOR)
+        if (layer == CONFIG_ZMK_BB9900_TRACKPAD_INDICATOR_LAYER) {
+            continue;
+        }
+#endif
+        if (zmk_keymap_layer_active(layer)) {
+            return layer;
+        }
+    }
+    return 0;
+}
+
 static int layer_indicator_listener(const zmk_event_t *eh) {
-    enum indicator_mode mode = mode_for_layer(zmk_keymap_highest_layer_active());
+    enum indicator_mode mode = mode_for_layer(indicated_layer());
 
     if (mode != state.mode) {
         state.mode = mode;

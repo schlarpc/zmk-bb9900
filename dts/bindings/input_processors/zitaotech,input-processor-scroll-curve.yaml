@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: MIT
+
+description: |
+  Turns relative X/Y pointer motion into scroll wheel motion through a two-segment curve:
+  the first knee counts of each sample scroll at low-gain, anything beyond at high-gain. A high
+  low-gain keeps slow scrolling responsive; a low high-gain stops fast swipes from flinging the
+  page, since speed switching already raises the sensor CPI on fast swipes.
+
+  Gains are in 1/16 of a high-resolution scroll unit per count, where 16 high-resolution units
+  make one wheel notch. With CONFIG_ZMK_POINTING_SMOOTH_SCROLLING off, output is whole notches
+  and the remainder carries over.
+
+  Scroll direction is the inverse of the motion direction, like dragging the page.
+
+compatible: "zitaotech,input-processor-scroll-curve"
+
+include: ip_zero_param.yaml
+
+properties:
+  knee:
+    type: int
+    default: 6
+    description: Counts per sample scrolled at low-gain before switching to high-gain.
+  low-gain:
+    type: int
+    default: 48
+    description: Gain below the knee, in 1/16 high-resolution units per count.
+  high-gain:
+    type: int
+    default: 5
+    description: Gain above the knee, in 1/16 high-resolution units per count.

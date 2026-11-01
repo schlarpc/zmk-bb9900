@@ -3,5 +3,5 @@
 add_subdirectory(drivers)
 
 target_sources_ifdef(CONFIG_ZMK_BB9900_LAYER_INDICATOR app PRIVATE src/layer_indicator.c)
-target_sources_ifdef(CONFIG_ZMK_BB9900_CAPSLOCK_INDICATOR app PRIVATE src/capslock_indicator.c)
-target_sources_ifdef(CONFIG_ZMK_BB9900_INDICATOR_SCROLL app PRIVATE src/input_processor_indicator_scroll.c)
+target_sources_ifdef(CONFIG_ZMK_BB9900_TRACKPAD_INDICATOR app PRIVATE src/trackpad_indicator.c)
+target_sources_ifdef(CONFIG_ZMK_BB9900_SCROLL_CURVE app PRIVATE src/input_processor_scroll_curve.c)

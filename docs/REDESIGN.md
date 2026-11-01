@@ -171,3 +171,19 @@ Where the current goes:
   - [ ] Alt+Shift (for example the Android language switch): tap `alt`, then tap `aA`, without the
     combo firing.
   - [ ] `$` types `$`. On UPPER, T/Y = `< >`, U = trackpad power, P = `=`.
+- Batch 2, trackpad modes. Scroll mode is now a keyboard-side SCROLL layer (layer 3) instead of
+  the host's caps lock. Tap Call to toggle it, or hold Call to scroll while held. Caps lock moved
+  to UPPER-Q. The trackpad backlight shows scroll mode, and the big-button layer light ignores
+  it. A new per-axis scroll curve replaces the caps-lock processor: low gain up to a knee, then
+  high gain, so it no longer depends on event order or a 30 ms tick. Smooth (high-resolution)
+  scrolling is on (`CONFIG_ZMK_POINTING_SMOOTH_SCROLLING` in `bb9900.conf`). Turn it off for Mac
+  or iOS hosts, which would otherwise scroll about 16x too fast. Precision mode and pointer
+  acceleration were skipped. To test:
+  - [ ] Tap Call: trackpad backlight on, trackpad scrolls. Tap Call again: back to the pointer.
+  - [ ] Hold Call and swipe: scrolls while held, pointer again on release.
+  - [ ] The big-button light does not change when scroll mode turns on.
+  - [ ] Scroll mode works together with SYM and UPPER, and keys behave as normal in scroll mode.
+  - [ ] Scrolling is smooth (pixel steps) on this Linux machine. Slow swipes are controllable;
+    fast swipes do not fling the page.
+  - [ ] Horizontal scroll works and goes the same way as vertical, like dragging the page.
+  - [ ] UPPER-Q toggles caps lock.

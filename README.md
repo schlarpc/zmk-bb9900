@@ -10,9 +10,9 @@ repo:
 |---|---|
 | `boards/zitaotech/bb9900/` | Board definition (Zephyr HWMv2, target `bb9900//zmk`) |
 | `drivers/input/input_a320.c` | ADBS-A320 trackpad, as a Zephyr input device |
-| `src/input_processor_indicator_scroll.c` | Scroll mode while caps lock is on |
+| `src/input_processor_scroll_curve.c` | Turns trackpad motion into scrolling on the scroll mode layer |
 | `src/layer_indicator.c` | Big button backlight shows the active layer |
-| `src/capslock_indicator.c` | Trackpad backlight shows caps lock |
+| `src/trackpad_indicator.c` | Trackpad backlight shows scroll mode |
 | `config/` | Your keymap, Kconfig overrides and the west manifest that pins ZMK |
 
 ## Usage
