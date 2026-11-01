@@ -14,12 +14,8 @@
     inherit (nixpkgs) lib;
     forAllSystems = lib.genAttrs (lib.attrNames zmk-nix.packages);
   in {
-    packages = forAllSystems (system: rec {
-      default = firmware;
-
-      firmware = zmk-nix.legacyPackages.${system}.buildKeyboard {
-        name = "bb9900-firmware";
-
+    packages = forAllSystems (system: let
+      buildFirmware = args: zmk-nix.legacyPackages.${system}.buildKeyboard ({
         src = lib.fileset.toSource {
           root = ./.;
           fileset = lib.fileset.unions [
@@ -49,9 +45,24 @@
           license = lib.licenses.mit;
           platforms = lib.platforms.all;
         };
+      } // args);
+    in rec {
+      default = firmware;
+
+      firmware = buildFirmware {
+        name = "bb9900-firmware";
+      };
+
+      # Logs over USB serial (/dev/ttyACM*), with debug output from the trackpad driver.
+      firmware-debug = buildFirmware {
+        name = "bb9900-firmware-debug";
+        inherit (firmware) westDeps;
+        snippets = [ "zmk-usb-logging" ];
+        extraCmakeFlags = [ "-DCONFIG_INPUT_LOG_LEVEL_DBG=y" ];
       };
 
       flash = zmk-nix.packages.${system}.flash.override { inherit firmware; };
+      flash-debug = zmk-nix.packages.${system}.flash.override { firmware = firmware-debug; };
       update = zmk-nix.packages.${system}.update;
     });
 

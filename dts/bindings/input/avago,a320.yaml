@@ -13,3 +13,19 @@ properties:
     type: int
     default: 10
     description: How often to poll the motion register.
+  ext-power:
+    type: phandle
+    description: |
+      External power control that supplies the sensor. Used to power cycle the sensor when it
+      stops responding.
+  speed-switching:
+    type: boolean
+    description: |
+      Let the sensor switch resolution with finger speed (250 to 1000 CPI), which acts as
+      built-in pointer acceleration. Off from reset; the datasheet power-up sequence enables it.
+  assert-deassert:
+    type: boolean
+    description: Gate motion on image quality, to reject noise when the finger lifts.
+  finger-detect:
+    type: boolean
+    description: Only report motion while a finger is on the sensor.

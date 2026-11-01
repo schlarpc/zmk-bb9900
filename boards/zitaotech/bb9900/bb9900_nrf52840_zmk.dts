@@ -94,7 +94,7 @@ RC(2,3)          RC(2,1)             RC(3,1)             RC(4,1)          RC(6,2
     };
 
     // Node name must match original "EXT_POWER" label to preserve user settings.
-    EXT_POWER {
+    ext_power_supply: EXT_POWER {
         compatible = "zmk,ext-power-generic";
         control-gpios = <&gpio0 13 GPIO_ACTIVE_LOW>;
     };
@@ -163,6 +163,10 @@ RC(2,3)          RC(2,1)             RC(3,1)             RC(4,1)          RC(6,2
         compatible = "avago,a320";
         reg = <0x3b>;
         polling-interval-ms = <10>;
+        ext-power = <&ext_power_supply>;
+        speed-switching;
+        assert-deassert;
+        finger-detect;
     };
 };
 
