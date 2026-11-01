@@ -23,6 +23,10 @@
 
 // Modifiers and layers are sticky, BlackBerry style: tap applies to the next key, hold works
 // as normal. Give up after 2 s instead of the default 1 s.
+//
+// The double-tap window (tapping-term-ms on the tap dances below) counts from the first press.
+// aA presses are also held back by the alt + aA combo for up to its timeout, so keep the window
+// generous: a single tap still resolves as soon as the next key is pressed.
 &sk {
     release-after-ms = <2000>;
     quick-release;
@@ -54,7 +58,7 @@
         td_shift: tap_dance_shift {
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
-            tapping-term-ms = <200>;
+            tapping-term-ms = <300>;
             bindings = <&sk LSHFT>, <&caps_word>;
         };
 
@@ -62,7 +66,7 @@
         td_sym: tap_dance_sym {
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
-            tapping-term-ms = <200>;
+            tapping-term-ms = <300>;
             bindings = <&sl SYM>, <&to SYM>;
         };
 
@@ -70,7 +74,7 @@
         td_upper: tap_dance_upper {
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
-            tapping-term-ms = <200>;
+            tapping-term-ms = <300>;
             bindings = <&sl UPPER>, <&to UPPER>;
         };
     };
