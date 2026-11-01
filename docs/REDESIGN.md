@@ -160,7 +160,7 @@ Where the current goes:
   `< >` moved to T/Y on UPPER, which pushed the ext power toggle from T to U. `KP_EQUAL` became
   `EQUAL`. To test:
   - [ ] Tap `aA`, then a letter: one capital. Hold `aA`: normal Shift.
-  - [ ] Double-tap `aA`: caps word, which ends at a space.
+  - [x] Double-tap `aA`: caps word, which ends at a space. (Needed a 300 ms window, `921c807`.)
   - [ ] Tap `0`, then C: Ctrl+C. Tap `alt`, then Tab: Alt+Tab. Hold `alt` and press Tab
     repeatedly: cycles windows.
   - [ ] Tap SYM, then W: `1`, then back to BASE. Hold SYM and type `123`. Double-tap SYM: locked
