@@ -225,3 +225,6 @@ Where the current goes:
   - [ ] UPPER, trackpad press: an immediate click.
   - [ ] UPPER-U toggles USB/BLE output. Space on UPPER types a space right away.
   - [ ] The trackpad works after a reboot.
+  - Passkey entry for Bluetooth pairing (`e4de503`). A new device can only pair after its
+    6-digit code is typed on the keyboard, which closes the open-profile "Just Works" gap.
+    - [x] Clear a profile, pair a phone, enter the code with locked SYM digits + Enter: pairs.
