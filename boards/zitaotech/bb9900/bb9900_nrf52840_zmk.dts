@@ -163,7 +163,7 @@ RC(2,3)          RC(2,1)             RC(3,1)             RC(4,1)          RC(6,2
         compatible = "avago,a320";
         reg = <0x3b>;
         polling-interval-ms = <10>;
-        motion-polling-interval-ms = <4>;
+        motion-polling-interval-ms = <2>;
         ext-power = <&ext_power_supply>;
         speed-switching;
         assert-deassert;
@@ -174,6 +174,7 @@ RC(2,3)          RC(2,1)             RC(3,1)             RC(4,1)          RC(6,2
         speed-thresholds = [  08   06   10   0c   18   14   20   1c ];
         high-cpi;
         // Tracking shutter values sit around 140-230 and jump well above that as the finger lifts.
+        // High-shutter samples that continue a fast stroke are still reported.
         liftoff-shutter-threshold = <240>;
     };
 };

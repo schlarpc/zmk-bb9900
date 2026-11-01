@@ -6,6 +6,8 @@
 
 #define DT_DRV_COMPAT avago_a320
 
+#include <stdlib.h>
+
 #include <zephyr/device.h>
 #include <zephyr/drivers/i2c.h>
 #include <zephyr/input/input.h>
@@ -52,6 +54,11 @@ LOG_MODULE_REGISTER(input_a320, CONFIG_INPUT_LOG_LEVEL);
 
 #define A320_SPEED_THRESHOLD_COUNT 8
 
+// A high-shutter sample is kept when it continues a fast stroke: at least this many counts in
+// the previous sample, in the same direction, no more than this long ago.
+#define A320_LIFTOFF_STROKE_MIN_COUNTS 8
+#define A320_LIFTOFF_STROKE_WINDOW_MS 20
+
 // Datasheet timings: tVRT-NRST after power is stable, tMOT-RST after a reset.
 #define A320_POWER_UP_DELAY_MS 100
 #define A320_RESET_DELAY_MS 25
@@ -88,6 +95,9 @@ struct a320_data {
     uint8_t failures;
     int64_t next_health_check;
     int64_t last_motion;
+    int64_t last_report;
+    int8_t last_dx;
+    int8_t last_dy;
     bool tracing_motion;
 };
 
@@ -194,7 +204,8 @@ static int a320_configure(const struct device *dev) {
     return 0;
 }
 
-static int a320_read_motion(const struct device *dev, int8_t *dx, int8_t *dy) {
+static int a320_read_motion(const struct device *dev, int8_t *dx, int8_t *dy,
+                            uint16_t *shutter) {
     const struct a320_config *cfg = dev->config;
     uint8_t motion, x, y;
     int ret;
@@ -226,6 +237,7 @@ static int a320_read_motion(const struct device *dev, int8_t *dx, int8_t *dy) {
 
     *dx = (int8_t)x;
     *dy = (int8_t)y;
+    *shutter = 0;
 
     if (cfg->liftoff_shutter_threshold > 0) {
         uint8_t sh_hi, sh_lo;
@@ -240,14 +252,29 @@ static int a320_read_motion(const struct device *dev, int8_t *dx, int8_t *dy) {
             return ret;
         }
 
-        uint16_t shutter = (sh_hi << 8) | sh_lo;
-        if (shutter > cfg->liftoff_shutter_threshold) {
-            LOG_DBG("dropping liftoff sample dx=%d dy=%d shutter=%u", *dx, *dy, shutter);
-            return -EAGAIN;
-        }
+        *shutter = (sh_hi << 8) | sh_lo;
     }
 
     return 0;
+}
+
+// The shutter time rises as the finger lifts, and those samples make the cursor twitch. At the
+// end of a fast swipe they still carry real motion, so only drop them outside a fast stroke.
+static bool a320_is_liftoff_twitch(const struct device *dev, int8_t dx, int8_t dy,
+                                   uint16_t shutter, int64_t now) {
+    const struct a320_config *cfg = dev->config;
+    const struct a320_data *data = dev->data;
+
+    if (cfg->liftoff_shutter_threshold == 0 || shutter <= cfg->liftoff_shutter_threshold) {
+        return false;
+    }
+
+    bool continues_stroke =
+        now - data->last_report <= A320_LIFTOFF_STROKE_WINDOW_MS &&
+        abs(data->last_dx) + abs(data->last_dy) >= A320_LIFTOFF_STROKE_MIN_COUNTS &&
+        data->last_dx * dx + data->last_dy * dy > 0;
+
+    return !continues_stroke;
 }
 
 // Returns the delay before the next step.
@@ -276,22 +303,30 @@ static uint32_t a320_step_running(const struct device *dev) {
     const struct a320_config *cfg = dev->config;
     struct a320_data *data = dev->data;
     int8_t dx, dy;
+    uint16_t shutter;
     int ret;
 
     int64_t now = k_uptime_get();
 
-    ret = a320_read_motion(dev, &dx, &dy);
+    ret = a320_read_motion(dev, &dx, &dy, &shutter);
     if (IS_ENABLED(CONFIG_INPUT_LOG_LEVEL_DBG) && (ret == 0 || ret == -ENODATA)) {
         a320_trace(dev, ret == 0, dx, dy);
     }
-    if (ret == 0 || ret == -EAGAIN) {
+    if (ret == 0) {
         data->last_motion = now;
     }
     if (ret == 0 && (dx != 0 || dy != 0)) {
-        // Always report both axes, X first, so input processors can rely on the ordering.
-        input_report_rel(dev, INPUT_REL_X, dx, false, K_FOREVER);
-        input_report_rel(dev, INPUT_REL_Y, dy, true, K_FOREVER);
-    } else if (ret < 0 && ret != -ENODATA && ret != -EAGAIN) {
+        if (a320_is_liftoff_twitch(dev, dx, dy, shutter, now)) {
+            LOG_DBG("dropping liftoff sample dx=%d dy=%d shutter=%u", dx, dy, shutter);
+        } else {
+            // Always report both axes, X first, so input processors can rely on the ordering.
+            input_report_rel(dev, INPUT_REL_X, dx, false, K_FOREVER);
+            input_report_rel(dev, INPUT_REL_Y, dy, true, K_FOREVER);
+            data->last_report = now;
+            data->last_dx = dx;
+            data->last_dy = dy;
+        }
+    } else if (ret < 0 && ret != -ENODATA) {
         // Also expected while ext power is toggled off with the T key.
         return a320_fail(dev, "motion read", ret);
     }
