@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: MIT
  */
 
-// Trackpad backlight, lit while the scroll mode layer is active.
+// Trackpad backlight, lit while the scroll mode layer is active. It turns off while the
+// keyboard is idle, like the keyboard backlight.
 
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
@@ -13,7 +14,9 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
+#include <zmk/activity.h>
 #include <zmk/event_manager.h>
+#include <zmk/events/activity_state_changed.h>
 #include <zmk/events/layer_state_changed.h>
 #include <zmk/keymap.h>
 
@@ -39,15 +42,17 @@ static int trackpad_indicator_listener(const zmk_event_t *eh) {
         return ZMK_EV_EVENT_BUBBLE;
     }
 
-    set_brightness(zmk_keymap_layer_active(CONFIG_ZMK_BB9900_TRACKPAD_INDICATOR_LAYER)
-                       ? CONFIG_ZMK_BB9900_TRACKPAD_INDICATOR_BRT
-                       : 0);
+    bool lit = zmk_keymap_layer_active(CONFIG_ZMK_BB9900_TRACKPAD_INDICATOR_LAYER) &&
+               zmk_activity_get_state() == ZMK_ACTIVITY_ACTIVE;
+
+    set_brightness(lit ? CONFIG_ZMK_BB9900_TRACKPAD_INDICATOR_BRT : 0);
 
     return ZMK_EV_EVENT_BUBBLE;
 }
 
 ZMK_LISTENER(bb9900_trackpad_indicator, trackpad_indicator_listener);
 ZMK_SUBSCRIPTION(bb9900_trackpad_indicator, zmk_layer_state_changed);
+ZMK_SUBSCRIPTION(bb9900_trackpad_indicator, zmk_activity_state_changed);
 
 static int trackpad_indicator_init(void) {
     if (!device_is_ready(leds)) {

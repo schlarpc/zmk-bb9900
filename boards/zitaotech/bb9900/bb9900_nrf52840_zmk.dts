@@ -70,6 +70,7 @@ RC(2,3)          RC(2,1)             RC(3,1)             RC(4,1)          RC(6,2
 
     kscan0: kscan {
         compatible = "zmk,kscan-gpio-matrix";
+        wakeup-source;
         diode-direction = "col2row";
         debounce-press-ms = <10>;
         debounce-release-ms = <10>;
@@ -161,6 +162,7 @@ RC(2,3)          RC(2,1)             RC(3,1)             RC(4,1)          RC(6,2
         reg = <0x3b>;
         polling-interval-ms = <10>;
         motion-polling-interval-ms = <4>;
+        idle-polling-interval-ms = <25>;
         ext-power = <&ext_power_supply>;
         speed-switching;
         assert-deassert;

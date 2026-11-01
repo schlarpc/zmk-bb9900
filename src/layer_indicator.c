@@ -7,6 +7,7 @@
 // Big button backlight as a layer indicator:
 //   layer 0: off, layer 1: steady, layer 2: breathing, layer 3 and above: blinking.
 // The scroll mode layer has its own indicator on the trackpad, so it is skipped here.
+// The light turns off while the keyboard is idle, like the keyboard backlight.
 
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
@@ -15,7 +16,9 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
+#include <zmk/activity.h>
 #include <zmk/event_manager.h>
+#include <zmk/events/activity_state_changed.h>
 #include <zmk/events/layer_state_changed.h>
 #include <zmk/keymap.h>
 
@@ -36,6 +39,7 @@ enum indicator_mode { MODE_OFF, MODE_ON, MODE_BREATHE, MODE_BLINK };
 
 static struct {
     enum indicator_mode mode;
+    bool idle;
     int breathe_brt;
     bool breathe_up;
     bool blink_high;
@@ -58,6 +62,11 @@ static void set_brightness(uint8_t brt) {
 }
 
 static void update_work_handler(struct k_work *work) {
+    if (state.idle) {
+        set_brightness(0);
+        return;
+    }
+
     switch (state.mode) {
     case MODE_OFF:
         set_brightness(0);
@@ -113,9 +122,11 @@ static uint8_t indicated_layer(void) {
 
 static int layer_indicator_listener(const zmk_event_t *eh) {
     enum indicator_mode mode = mode_for_layer(indicated_layer());
+    bool idle = zmk_activity_get_state() != ZMK_ACTIVITY_ACTIVE;
 
-    if (mode != state.mode) {
+    if (mode != state.mode || idle != state.idle) {
         state.mode = mode;
+        state.idle = idle;
         k_work_reschedule(&update_work, K_NO_WAIT);
     }
 
@@ -124,6 +135,7 @@ static int layer_indicator_listener(const zmk_event_t *eh) {
 
 ZMK_LISTENER(bb9900_layer_indicator, layer_indicator_listener);
 ZMK_SUBSCRIPTION(bb9900_layer_indicator, zmk_layer_state_changed);
+ZMK_SUBSCRIPTION(bb9900_layer_indicator, zmk_activity_state_changed);
 
 static int layer_indicator_init(void) {
     if (!device_is_ready(leds)) {

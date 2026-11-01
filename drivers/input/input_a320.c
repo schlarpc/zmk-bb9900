@@ -13,6 +13,7 @@
 #include <zephyr/input/input.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/pm/device.h>
 
 #include <drivers/ext_power.h>
 
@@ -83,6 +84,8 @@ struct a320_config {
     uint32_t polling_interval_ms;
     uint32_t motion_polling_interval_ms;
     uint32_t motion_timeout_ms;
+    uint32_t idle_polling_interval_ms;
+    uint32_t idle_timeout_ms;
     uint16_t liftoff_shutter_threshold;
     uint8_t ofn_engine;
     uint8_t ofn_speed_control;
@@ -351,10 +354,14 @@ static uint32_t a320_step_running(const struct device *dev) {
         }
     }
 
-    if (now - data->last_motion < cfg->motion_timeout_ms) {
+    int64_t since_motion = now - data->last_motion;
+    if (since_motion < cfg->motion_timeout_ms) {
         return cfg->motion_polling_interval_ms;
     }
-    return cfg->polling_interval_ms;
+    if (since_motion < cfg->idle_timeout_ms) {
+        return cfg->polling_interval_ms;
+    }
+    return cfg->idle_polling_interval_ms;
 }
 
 static void a320_work_handler(struct k_work *work) {
@@ -404,6 +411,27 @@ static void a320_work_handler(struct k_work *work) {
     k_work_schedule(&data->work, K_MSEC(delay_ms));
 }
 
+#ifdef CONFIG_PM_DEVICE
+// Ext power, and with it the sensor, is cut while suspended, so start over from a reset on
+// resume.
+static int a320_pm_action(const struct device *dev, enum pm_device_action action) {
+    struct a320_data *data = dev->data;
+
+    switch (action) {
+    case PM_DEVICE_ACTION_SUSPEND:
+        k_work_cancel_delayable(&data->work);
+        return 0;
+    case PM_DEVICE_ACTION_RESUME:
+        data->state = A320_STATE_RESET;
+        data->failures = 0;
+        k_work_schedule(&data->work, K_MSEC(A320_POWER_UP_DELAY_MS));
+        return 0;
+    default:
+        return -ENOTSUP;
+    }
+}
+#endif /* CONFIG_PM_DEVICE */
+
 static int a320_init(const struct device *dev) {
     const struct a320_config *cfg = dev->config;
     struct a320_data *data = dev->data;
@@ -441,6 +469,8 @@ static int a320_init(const struct device *dev) {
         .polling_interval_ms = DT_INST_PROP(n, polling_interval_ms),                               \
         .motion_polling_interval_ms = DT_INST_PROP(n, motion_polling_interval_ms),                 \
         .motion_timeout_ms = DT_INST_PROP(n, motion_timeout_ms),                                   \
+        .idle_polling_interval_ms = DT_INST_PROP(n, idle_polling_interval_ms),                     \
+        .idle_timeout_ms = DT_INST_PROP(n, idle_timeout_ms),                                       \
         .liftoff_shutter_threshold = DT_INST_PROP(n, liftoff_shutter_threshold),                   \
         .ofn_engine = A320_OFN_ENGINE_BITS(n),                                                     \
         .ofn_speed_control =                                                                       \
@@ -450,7 +480,8 @@ static int a320_init(const struct device *dev) {
         .has_speed_thresholds = DT_INST_NODE_HAS_PROP(n, speed_thresholds),                        \
         .speed_thresholds = DT_INST_PROP_OR(n, speed_thresholds, {0}),                             \
     };                                                                                             \
-    DEVICE_DT_INST_DEFINE(n, a320_init, NULL, &a320_data_##n, &a320_config_##n, POST_KERNEL,       \
-                          CONFIG_INPUT_INIT_PRIORITY, NULL);
+    PM_DEVICE_DT_INST_DEFINE(n, a320_pm_action);                                                   \
+    DEVICE_DT_INST_DEFINE(n, a320_init, PM_DEVICE_DT_INST_GET(n), &a320_data_##n,                  \
+                          &a320_config_##n, POST_KERNEL, CONFIG_INPUT_INIT_PRIORITY, NULL);
 
 DT_INST_FOREACH_STATUS_OKAY(A320_DEFINE)

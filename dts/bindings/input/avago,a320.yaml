@@ -23,6 +23,16 @@ properties:
     type: int
     default: 100
     description: How long after the last motion to keep polling at the motion rate.
+  idle-polling-interval-ms:
+    type: int
+    default: 25
+    description: |
+      How often to poll once the finger has been still for idle-timeout-ms. The first movement
+      after a pause can lag by up to this much.
+  idle-timeout-ms:
+    type: int
+    default: 1000
+    description: How long without motion before dropping to the idle polling rate.
   ext-power:
     type: phandle
     description: |
