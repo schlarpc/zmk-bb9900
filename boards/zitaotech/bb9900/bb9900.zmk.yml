@@ -7,6 +7,7 @@ features:
   - keys
   - pointer
   - backlight
+  - studio
 outputs:
   - usb
   - ble

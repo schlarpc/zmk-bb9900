@@ -145,7 +145,7 @@
             bindings = <
                  &msc SCRL_UP                                                                                       &msc SCRL_DOWN
     &bt BT_SEL 0            &bt BT_SEL 1                             &td0                           &bt BT_SEL 2                     &bt BT_SEL 3
-    &kp CLCK     &kp UP     &none       &sys_reset &kp LT        &kp GT            &ext_power EP_TOG &none          &kp PIPE         &kp EQUAL
+    &kp CLCK     &kp UP     &studio_unlock &sys_reset &kp LT        &kp GT            &ext_power EP_TOG &none          &kp PIPE         &kp EQUAL
     &kp LEFT     &kp DOWN   &kp RIGHT   &none      &kp BSLH      &kp AMPS          &kp LBRC         &kp RBRC        &kp CARET        &kp BSPC
     &trans       &none      &none       &none      &bl BL_DEC    &bl BL_TOG        &bl BL_INC       &none           &bootloader      &kp ENTER
     &trans                  &trans                                   &hm OUT_TOG SPACE              &to SYM                          &trans

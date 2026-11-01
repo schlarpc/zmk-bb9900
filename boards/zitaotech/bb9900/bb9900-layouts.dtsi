@@ -1,0 +1,62 @@
+/*
+ * Copyright (c) 2026 The zmk-bb9900 contributors
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+#include <physical_layouts.dtsi>
+
+/ {
+    // Approximate BB9900 geometry, in 1/100 of a key unit. The letter rows curve up towards the
+    // edges like the real "smile" keyboard. Key order follows the matrix transform.
+    bb9900_layout: bb9900_layout {
+        compatible = "zmk,physical-layout";
+        display-name = "BB9900";
+        transform = <&default_transform>;
+
+        keys  //                     w   h    x    y     rot    rx    ry
+            = <&key_physical_attrs 150  50    0    0       0     0     0>
+            , <&key_physical_attrs 150  50  850    0       0     0     0>
+            , <&key_physical_attrs 150  75    0   75       0     0     0>
+            , <&key_physical_attrs 150  75  175   75       0     0     0>
+            , <&key_physical_attrs 200 100  400   62       0     0     0>
+            , <&key_physical_attrs 150  75  625   75       0     0     0>
+            , <&key_physical_attrs 150  75  850   75       0     0     0>
+            , <&key_physical_attrs 100 100    0  170       0     0     0>
+            , <&key_physical_attrs 100 100  100  184       0     0     0>
+            , <&key_physical_attrs 100 100  200  193       0     0     0>
+            , <&key_physical_attrs 100 100  300  198       0     0     0>
+            , <&key_physical_attrs 100 100  400  200       0     0     0>
+            , <&key_physical_attrs 100 100  500  200       0     0     0>
+            , <&key_physical_attrs 100 100  600  198       0     0     0>
+            , <&key_physical_attrs 100 100  700  193       0     0     0>
+            , <&key_physical_attrs 100 100  800  184       0     0     0>
+            , <&key_physical_attrs 100 100  900  170       0     0     0>
+            , <&key_physical_attrs 100 100    0  270       0     0     0>
+            , <&key_physical_attrs 100 100  100  284       0     0     0>
+            , <&key_physical_attrs 100 100  200  293       0     0     0>
+            , <&key_physical_attrs 100 100  300  298       0     0     0>
+            , <&key_physical_attrs 100 100  400  300       0     0     0>
+            , <&key_physical_attrs 100 100  500  300       0     0     0>
+            , <&key_physical_attrs 100 100  600  298       0     0     0>
+            , <&key_physical_attrs 100 100  700  293       0     0     0>
+            , <&key_physical_attrs 100 100  800  284       0     0     0>
+            , <&key_physical_attrs 100 100  900  270       0     0     0>
+            , <&key_physical_attrs 100 100    0  370       0     0     0>
+            , <&key_physical_attrs 100 100  100  384       0     0     0>
+            , <&key_physical_attrs 100 100  200  393       0     0     0>
+            , <&key_physical_attrs 100 100  300  398       0     0     0>
+            , <&key_physical_attrs 100 100  400  400       0     0     0>
+            , <&key_physical_attrs 100 100  500  400       0     0     0>
+            , <&key_physical_attrs 100 100  600  398       0     0     0>
+            , <&key_physical_attrs 100 100  700  393       0     0     0>
+            , <&key_physical_attrs 100 100  800  384       0     0     0>
+            , <&key_physical_attrs 100 100  900  370       0     0     0>
+            , <&key_physical_attrs 200 100    0  500       0     0     0>
+            , <&key_physical_attrs 200 100  200  500       0     0     0>
+            , <&key_physical_attrs 200 100  400  500       0     0     0>
+            , <&key_physical_attrs 200 100  600  500       0     0     0>
+            , <&key_physical_attrs 200 100  800  500       0     0     0>
+            ;
+    };
+};

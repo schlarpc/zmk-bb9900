@@ -32,6 +32,9 @@
 
         board = "bb9900//zmk";
 
+        # Live keymap editing over USB and BLE: https://zmk.studio
+        enableZmkStudio = true;
+
         # Keep the resolved devicetree and Kconfig next to the firmware for debugging.
         postInstall = ''
           mkdir -p $out/debug

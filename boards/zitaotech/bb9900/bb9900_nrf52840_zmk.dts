@@ -14,6 +14,7 @@
 #include <input/processors.dtsi>
 
 #include "bb9900-pinctrl.dtsi"
+#include "bb9900-layouts.dtsi"
 
 / {
     model = "bb9900";
@@ -25,7 +26,7 @@
         zephyr,flash = &flash0;
         zmk,battery = &vbatt;
         zmk,kscan = &kscan0;
-        zmk,matrix-transform = &default_transform;
+        zmk,physical-layout = &bb9900_layout;
         zmk,backlight = &backlight;
         zitaotech,layer-indicator = &layer_indicator_leds;
         zitaotech,trackpad-indicator = &trackpad_indicator_leds;
