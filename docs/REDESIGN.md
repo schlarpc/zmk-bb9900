@@ -179,11 +179,11 @@ Where the current goes:
   scrolling is on (`CONFIG_ZMK_POINTING_SMOOTH_SCROLLING` in `bb9900.conf`). Turn it off for Mac
   or iOS hosts, which would otherwise scroll about 16x too fast. Precision mode and pointer
   acceleration were skipped. To test:
-  - [ ] Tap Call: trackpad backlight on, trackpad scrolls. Tap Call again: back to the pointer.
-  - [ ] Hold Call and swipe: scrolls while held, pointer again on release.
+  - [x] Tap Call: trackpad backlight on, trackpad scrolls. Tap Call again: back to the pointer.
+  - [x] Hold Call and swipe: scrolls while held, pointer again on release.
   - [ ] The big-button light does not change when scroll mode turns on.
-  - [ ] Scroll mode works together with SYM and UPPER, and keys behave as normal in scroll mode.
+  - [x] Scroll mode works together with SYM and UPPER, and keys behave as normal in scroll mode.
   - [ ] Scrolling is smooth (pixel steps) on this Linux machine. Slow swipes are controllable;
     fast swipes do not fling the page.
-  - [ ] Horizontal scroll works and goes the same way as vertical, like dragging the page.
-  - [ ] UPPER-Q toggles caps lock.
+  - [ ] Horizontal scroll goes the same way as vertical, like a wheel (first build had it reversed).
+  - [x] UPPER-Q toggles caps lock.

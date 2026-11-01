@@ -45,18 +45,24 @@ static int scroll_curve_handle_event(const struct device *dev, struct input_even
     const struct scroll_curve_config *cfg = dev->config;
     struct scroll_curve_data *data = dev->data;
     int axis;
+    int32_t sign;
 
     if (event->type != INPUT_EV_REL) {
         return ZMK_INPUT_PROC_CONTINUE;
     }
 
     switch (event->code) {
+    // Scroll like a wheel: finger down scrolls the view down, finger right scrolls it right.
+    // HID counts the vertical wheel as positive upwards but the horizontal wheel as positive to
+    // the right, so only Y flips. Natural scrolling on the host reverses both together.
     case INPUT_REL_X:
         axis = 0;
+        sign = 1;
         event->code = INPUT_REL_HWHEEL;
         break;
     case INPUT_REL_Y:
         axis = 1;
+        sign = -1;
         event->code = INPUT_REL_WHEEL;
         break;
     default:
@@ -68,8 +74,7 @@ static int scroll_curve_handle_event(const struct device *dev, struct input_even
         divisor *= HI_RES_PER_NOTCH;
     }
 
-    // Scroll opposite to the finger, like dragging the page.
-    int32_t total = data->remainder[axis] - apply_curve(cfg, event->value);
+    int32_t total = data->remainder[axis] + sign * apply_curve(cfg, event->value);
     int32_t out = total / divisor;
     data->remainder[axis] = total - out * divisor;
     event->value = out;

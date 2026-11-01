@@ -10,7 +10,8 @@ description: |
   make one wheel notch. With CONFIG_ZMK_POINTING_SMOOTH_SCROLLING off, output is whole notches
   and the remainder carries over.
 
-  Scroll direction is the inverse of the motion direction, like dragging the page.
+  Scrolls like a wheel: finger down scrolls the view down, finger right scrolls it right. Turn
+  on natural scrolling on the host to reverse both.
 
 compatible: "zitaotech,input-processor-scroll-curve"
 
