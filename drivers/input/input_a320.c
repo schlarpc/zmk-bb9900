@@ -291,9 +291,9 @@ static uint32_t a320_fail(const struct device *dev, const char *what, int err) {
     data->failures++;
     LOG_WRN("%s failed (%d), attempt %d", what, err, data->failures);
 
-    // Only power cycle when ext power is meant to be on, so the T key can still turn it off.
-    if (cfg->ext_power != NULL && data->failures >= A320_FAILURES_BEFORE_POWER_CYCLE &&
-        ext_power_get(cfg->ext_power) > 0) {
+    // This also turns ext power back on if it was left off, for example by a saved state from
+    // an &ext_power toggle, so do not bind &ext_power in the keymap alongside this driver.
+    if (cfg->ext_power != NULL && data->failures >= A320_FAILURES_BEFORE_POWER_CYCLE) {
         LOG_WRN("power cycling sensor");
         data->failures = 0;
         ext_power_disable(cfg->ext_power);
@@ -333,7 +333,6 @@ static uint32_t a320_step_running(const struct device *dev) {
             data->last_dy = dy;
         }
     } else if (ret < 0 && ret != -ENODATA) {
-        // Also expected while ext power is toggled off with the T key.
         return a320_fail(dev, "motion read", ret);
     }
 

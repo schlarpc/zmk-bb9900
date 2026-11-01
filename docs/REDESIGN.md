@@ -212,3 +212,16 @@ Where the current goes:
   - The repo is public at <https://github.com/schlarpc/zmk-bb9900>, with CI building every push
     and PR and weekly ZMK and flake update PRs.
   - [x] Studio connects, shows the BB9900 layout and edits work.
+- Batch 5, safety:
+  - Clearing a Bluetooth profile moved from double-tapping the trackpad on UPPER to holding a
+    big button on UPPER for 2 s, which selects and clears that profile. The trackpad press on
+    UPPER is a plain click again, without the 400 ms tap-dance delay.
+  - The trackpad power toggle is gone. The driver recovers the sensor itself, and it now
+    powers ext power back on even if a saved state left it off.
+  - USB/BLE output moved from hold-Space to UPPER-U. Space on UPPER is a plain Space.
+  To test:
+  - [ ] UPPER, tap a big button: switches profile. Hold one for 2 s: that profile clears and the
+    keyboard advertises for pairing.
+  - [ ] UPPER, trackpad press: an immediate click.
+  - [ ] UPPER-U toggles USB/BLE output. Space on UPPER types a space right away.
+  - [ ] The trackpad works after a reboot.

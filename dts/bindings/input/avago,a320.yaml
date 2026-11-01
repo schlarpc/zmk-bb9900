@@ -37,7 +37,7 @@ properties:
     type: phandle
     description: |
       External power control that supplies the sensor. Used to power cycle the sensor when it
-      stops responding.
+      stops responding, which also turns it back on if it was left off.
   speed-switching:
     type: boolean
     description: |

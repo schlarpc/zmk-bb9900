@@ -502,28 +502,27 @@ path.combo {
 </g>
 <g transform="translate(42, 63)" class="key keypos-2">
 <rect rx="6" ry="6" x="-40" y="-19" width="80" height="38" class="key"/>
-<text x="0" y="0" class="key tap">BT</text>
-<text x="0" y="17" class="key hold">0</text>
+<text x="0" y="0" class="key tap">BT0</text>
+<text x="0" y="17" class="key hold">hold: clear</text>
 </g>
 <g transform="translate(140, 63)" class="key keypos-3">
 <rect rx="6" ry="6" x="-40" y="-19" width="80" height="38" class="key"/>
-<text x="0" y="0" class="key tap">BT</text>
-<text x="0" y="17" class="key hold">1</text>
+<text x="0" y="0" class="key tap">BT1</text>
+<text x="0" y="17" class="key hold">hold: clear</text>
 </g>
 <g transform="translate(280, 63)" class="key keypos-4">
 <rect rx="6" ry="6" x="-54" y="-26" width="108" height="52" class="key"/>
 <text x="0" y="0" class="key tap">Click</text>
-<text x="0" y="24" class="key hold">2×: BT clear</text>
 </g>
 <g transform="translate(392, 63)" class="key keypos-5">
 <rect rx="6" ry="6" x="-40" y="-19" width="80" height="38" class="key"/>
-<text x="0" y="0" class="key tap">BT</text>
-<text x="0" y="17" class="key hold">2</text>
+<text x="0" y="0" class="key tap">BT2</text>
+<text x="0" y="17" class="key hold">hold: clear</text>
 </g>
 <g transform="translate(518, 63)" class="key keypos-6">
 <rect rx="6" ry="6" x="-40" y="-19" width="80" height="38" class="key"/>
-<text x="0" y="0" class="key tap">BT</text>
-<text x="0" y="17" class="key hold">3</text>
+<text x="0" y="0" class="key tap">BT3</text>
+<text x="0" y="17" class="key hold">hold: clear</text>
 </g>
 <g transform="translate(28, 123)" class="key keypos-7">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
@@ -555,9 +554,7 @@ path.combo {
 </g>
 <g transform="translate(364, 139)" class="key keypos-13">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
-<text x="0" y="0" class="key tap">
-<tspan x="0" dy="-0.6em">Pad</tspan><tspan x="0" dy="1.2em">power</tspan>
-</text>
+<text x="0" y="0" class="key tap">USB/BLE</text>
 </g>
 <g transform="translate(420, 136)" class="key keypos-14">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
@@ -658,7 +655,6 @@ path.combo {
 <g transform="translate(280, 308)" class="key keypos-39">
 <rect rx="6" ry="6" x="-54" y="-26" width="108" height="52" class="key"/>
 <text x="0" y="0" class="key tap">Space</text>
-<text x="0" y="24" class="key hold">USB/BLE</text>
 </g>
 <g transform="translate(392, 308)" class="key keypos-40">
 <rect rx="6" ry="6" x="-54" y="-26" width="108" height="52" class="key"/>

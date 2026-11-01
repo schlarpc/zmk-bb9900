@@ -45,9 +45,9 @@ also fixes several problems with the stock firmware.
 | Trackpad press, shoulder keys | Left click, left click, right click |
 
 On UPPER:
-- the four big buttons select Bluetooth profiles 0–3;
-- double-tapping the trackpad clears the current profile;
-- holding Space toggles USB/BLE output;
+- the four big buttons select Bluetooth profiles 0–3; hold one for 2 s to clear that profile
+  and pair a new device;
+- U toggles USB/BLE output;
 - `$` enters the bootloader.
 
 The big-button backlight shows the layer: off on BASE, steady on SYM, breathing on UPPER.

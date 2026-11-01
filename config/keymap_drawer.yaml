@@ -6,14 +6,17 @@ parse_config:
   raw_binding_map:
     "&mkp LCLK": Click
     "&mkp RCLK": R-Click
-    "&td0": {t: Click, h: "2×: BT clear"}
+    "&bt_profile 0 0": {t: BT0, h: "hold: clear"}
+    "&bt_profile 1 1": {t: BT1, h: "hold: clear"}
+    "&bt_profile 2 2": {t: BT2, h: "hold: clear"}
+    "&bt_profile 3 3": {t: BT3, h: "hold: clear"}
+    "&out OUT_TOG": USB/BLE
     "&td_shift": {t: Shift, h: "2× caps word"}
     "&td_sym": {t: SYM, h: "2×: lock"}
     "&sk LALT": {t: Alt, h: sticky}
     "&sk LCTRL": {t: Ctrl, h: sticky}
     "&scroll_mode SCROLL SCROLL": {t: Scroll, h: hold}
     "&mt ESC K_BACK": {t: Back, h: Esc}
-    "&hm OUT_TOG SPACE": {t: Space, h: USB/BLE}
     "&to BASE": BASE
     "&to SYM": SYM
     "&msc SCRL_UP": Scroll↑
@@ -21,7 +24,6 @@ parse_config:
     "&bl BL_DEC": Dim
     "&bl BL_TOG": Light
     "&bl BL_INC": Bright
-    "&ext_power EP_TOG": Pad power
     "&sys_reset": Reset
     "&bootloader": Boot loader
     "&studio_unlock": Studio unlock
