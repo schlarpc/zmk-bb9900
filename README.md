@@ -96,7 +96,7 @@ nix run .#update
 | `src/layer_indicator.c`, `src/trackpad_indicator.c` | Big-button and trackpad backlights |
 | `src/usb_suspend_unplug.c` | Deep sleep workaround for the VBUS back-feed |
 | `config/` | Keymap, settings, keymap-drawer config and the west manifest |
-| `docs/` | Test checklists and design notes |
+| `docs/` | Keymap image and redesign notes |
 
 ## Credits
 
