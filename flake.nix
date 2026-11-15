@@ -56,7 +56,7 @@
           cp zephyr/zephyr.dts zephyr/.config $out/debug/
         '';
 
-        zephyrDepsHash = "sha256-zDnYk7iavZLcuPRrl8QUMROnvikwBGOrDa5prc2cFtk=";
+        zephyrDepsHash = "sha256-hIVacc9WuXEjIBlM4d6j55H8+FqmXjA5/Hyn+Vk2FgE=";
 
         meta = {
           description = "ZMK firmware for the BB9900 keyboard";
